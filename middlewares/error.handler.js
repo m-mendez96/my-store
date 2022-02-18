@@ -1,26 +1,24 @@
-const res = require("express/lib/response");
+function logErrors (err, req, res, next) {
+    console.log('logErrors');
+    console.error(err);
+    next(err);
+}
 
- function logErrors (error, req, res, next){
-    console.log("logErrors"); 
-    console.log(error);
-    next(error);
- }
-
- function errorHandler(error, rerq, resm, next){
-    console.log("errorHandler");  
+function errorHandler(err, req, res, next) {
+    console.log('errorHandler');
     res.status(500).json({
-        message: error.message,
-        stack: error.stack
-     });
- }
+        message: err.message,
+        stack: err.stack,
+    });
+}
 
-function boomErrorHandler(error, rerq, resm, next){
-    console.log("boomErrorHandler");
-    if (error.isBoom){
-        const { output } = error;
+function boomErrorHandler(err, req, res, next) {
+    console.log('boomErrorHandler');
+    if (err.isBoom) {
+        const { output } = err;
         res.status(output.statusCode).json(output.payload);
-    }  
-    next(error);
- }
+    }
+    next(err);
+}
 
- module.exports = { logErrors, errorHandler, boomErrorHandler }
+module.exports = { logErrors, errorHandler, boomErrorHandler }
