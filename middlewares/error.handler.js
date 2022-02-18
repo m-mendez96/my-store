@@ -3,7 +3,7 @@ const res = require("express/lib/response");
  function logErrors (error, req, res, next){
     console.log("logErrors"); 
     console.log(error);
-     next(error);
+    next(error);
  }
 
  function errorHandler(error, rerq, resm, next){
@@ -14,4 +14,13 @@ const res = require("express/lib/response");
      });
  }
 
- module.exports = { logErrors, errorHandler }
+function boomErrorHandler(error, rerq, resm, next){
+    console.log("boomErrorHandler");
+    if (error.isBoom){
+        const { output } = error;
+        res.status(output.statusCode).json(output.payload);
+    }  
+    next(error);
+ }
+
+ module.exports = { logErrors, errorHandler, boomErrorHandler }
