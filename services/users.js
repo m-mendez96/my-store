@@ -24,13 +24,11 @@ class UsersSerivce {
         return this.users;
     }
 
-    async create(body){
-        const newUser = {
-            id: faker.datatype.uuid(),
-            name: faker.name.firstName(),
-            email: faker.internet.email()
-        }
-        this.users.push(newUser);
+    async create(data){
+        //const unique = await models.User.findOne({email: data["email"]});
+        //if (unique != null)
+        //    throw boom.badRequest("user email exits");
+        const newUser = await models.User.create(data);
         return newUser;
     }
 
@@ -40,7 +38,7 @@ class UsersSerivce {
     }
 
     async findOne(id){
-        const user = this.users.find(item => item.id == id);
+        const user = await models.User.findByPk(id);
         if (!user){
             throw boom.notFound("user not found");
         }
@@ -48,24 +46,14 @@ class UsersSerivce {
     }
 
     async update(id, changes){
-        const index = this.users.findIndex(item => item.id === id);
-        if (index === -1) {
-            throw boom.notFound("user not found");
-        }
-        const user = this.users[index];
-        this.users[index] = {
-          ...user,
-          ...changes
-        };
-        return this.users[index];
+        const user = await this.findOne(id);
+        const rta = await user.update(changes);
+        return rta;
       }
 
     async delete(id){
-        const index = this.users.findIndex(item => item.id === id);
-        if (index === -1){
-            throw boom.notFound("user not found");
-        }
-        this.users.splice(index, 1);
+        const user = await this.findOne(id);
+        await user.destroy();
         return { id };
     }
 
