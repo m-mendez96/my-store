@@ -26,12 +26,15 @@ router.get("/:id",
   }
 );
 
-router.post("/", 
-    validatorHandler(creareProductSchema, "body"),
-    async (req, res) => {
-    const body = req.body;
-    const newProduct = await service.create(body);
-    res.status(201).json(newProduct);
+router.post('/',
+  validatorHandler(creareProductSchema, 'body'),
+  async (req, res, next) => {
+    try {
+      const body = req.body;
+      res.status(201).json(await service.create(body));
+    } catch (error) {
+      next(error);
+    }
   }
 );
 
