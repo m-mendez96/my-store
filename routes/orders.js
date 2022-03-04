@@ -3,7 +3,7 @@ const { required, valid } = require("joi");
 
 const OrdersService = require("./../services/orders");
 const validatorHandler = require("./../middlewares/validator.handler");
-const { creareOrderSchema, updateOrderSchema, getOrderSchema} = require("./../schemas/orders");
+const { creareOrderSchema, updateOrderSchema, getOrderSchema, addItemSchema} = require("./../schemas/orders");
 
 const router = express.Router();
 const service = new OrdersService();
@@ -58,5 +58,17 @@ router.delete("/:id", async (req, res) => {
     const rta =  await service.delete(id);
     res.json(rta);
 });
+
+router.post('/add-item',
+  validatorHandler(addItemSchema, 'body'),
+  async (req, res, next) => {
+    try {
+      const body = req.body;
+      res.status(201).json(await service.addItem(body));
+    } catch (error) {
+      next(error);
+    }
+  }
+);
 
 module.exports = router
