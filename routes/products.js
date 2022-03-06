@@ -3,14 +3,20 @@ const { required, valid } = require("joi");
 
 const ProductsService = require("./../services/products");
 const validatorHandler = require("./../middlewares/validator.handler");
-const { creareProductSchema, updateProductSchema, getProductSchema} = require("./../schemas/products");
+const { creareProductSchema, updateProductSchema, getProductSchema, queryProductSchema } = require("./../schemas/products");
 
 const router = express.Router();
 const service = new ProductsService();
 
-router.get("/", async (req, res)=>{
-    const products = await service.find();
-    res.json(products)
+router.get("/", 
+  validatorHandler(queryProductSchema, 'query'),
+  async (req, res, next)=>{
+    try {
+      const products = await service.find(req.query);
+      res.json(products)
+    } catch (error) {
+      next(error);
+    }
 });
 
 router.get("/:id",
