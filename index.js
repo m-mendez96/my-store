@@ -21,6 +21,8 @@ app.use(express.json());
 //}
 //app.use(cors(options));
 
+require('./utils/auth');
+
 app.get("/", checkApiKey, (req, res)=> {
     res.send("Server Express");
 });
