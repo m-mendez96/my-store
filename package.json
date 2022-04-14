@@ -33,6 +33,7 @@
     "faker": "^6.6.6",
     "fakerr": "^0.0.1",
     "joi": "^17.6.0",
+    "jsonwebtoken": "^8.5.1",
     "passport": "^0.5.2",
     "passport-local": "^1.0.0",
     "pg": "^8.7.3",
