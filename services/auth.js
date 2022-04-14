@@ -35,27 +35,40 @@ class AuthService {
     };
   }
 
-  async sendMail(email){
+  async sendRecoveryPassword(email) {
     const user = await service.findByEmail(email);
     if (!user) {
       throw boom.unauthorized();
     }
+
+    const payload = { sub: user.id };
+    const token = jwt.sign(payload, config.jwtSecret);
+    const link =  `http://frontend.com/recovery?token=${token}`;
+
+    await service.update(user.id, {recoveryToken: token});
+
+    const mail = {
+      from: config.smtpEmail, // sender address
+      to: `${user.email}`, // list of receivers
+      subject: "Recovery Password", // Subject line
+      text: "Recovery Password", // plain text body
+      html:  `<b> Click on link => ${link}<b>`, // html body
+    }
+    const rta = await this.sendMail(mail);
+    return rta;
+  }
+
+  async sendMail(infoMail){
     const transporter = nodemailer.createTransport({
       host: "smtp.ethereal.email",
       secure: false, // true for 465, false for other ports
       port: 587,
       auth: {
-          user: 'nakia.olson39@ethereal.email',
-          pass: 'T4ZFqgTnESbHHaCpEh'
+          user: config.smtpEmail,
+          pass: config.smtpPassword
       }
     });
-    await transporter.sendMail({
-      from: 'nakia.olson39@ethereal.email', // sender address
-      to: `${user.email}`, // list of receivers
-      subject: "Hello ✔", // Subject line
-      text: "Hello world?", // plain text body
-      html: "<b>Hello world?</b>", // html body
-    });
+    await transporter.sendMail(infoMail);
     return { message: 'mail sent' };
   }
 }
